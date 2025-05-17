@@ -15,22 +15,27 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => ['required'],
+            'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // Find or create a user with the given email
-        $user = \App\Models\User::firstOrCreate(
-            ['email' => $request->email],
-            [
-                'name' => 'Demo User',
-                'password' => bcrypt($request->password),
-            ]
-        );
+        // Check if user exists
+        $user = \App\Models\User::where('email', $request->email)->first();
 
-        Auth::login($user);
+        if (!$user) {
+            return redirect()->route('register')
+                ->with('error', 'No account found with this email. Please register first.');
+        }
+
+        // Attempt to authenticate
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])->withInput($request->only('email'));
+        }
+
         $request->session()->regenerate();
-        return redirect()->route('products.create');
+        return redirect()->route('products.index');
     }
 
     public function logout(Request $request)
@@ -39,5 +44,28 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
+    }
+
+    public function showRegistrationForm()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = \App\Models\User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+        ]);
+
+        // Remove auto-login and redirect to login page with success message
+        return redirect()->route('login')->with('success', 'Registration successful! Please login.');
     }
 }

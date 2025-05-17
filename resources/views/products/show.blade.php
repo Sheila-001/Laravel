@@ -39,6 +39,30 @@
                     </div>
                 </div>
                 <div class="mb-3 row">
+                    <label class="col-md-4 col-form-label text-md-end text-start fw-bold">Product Image:</label>
+                    <div class="col-md-6 pt-2">
+                        @if($product->file)
+                            <div class="product-image-container">
+                                <img src="{{ asset('storage/uploads/' . $product->file) }}" 
+                                     alt="{{ $product->name }}" 
+                                     class="img-fluid rounded shadow-sm" 
+                                     style="max-width: 300px; max-height: 300px; object-fit: contain;">
+                                <!-- <div class="mt-2">
+                                    <a href="{{ asset('storage/uploads/' . $product->file) }}" 
+                                       target="_blank" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        View Full Size
+                                    </a>
+                                </div> -->
+                            </div>
+                        @else
+                            <div class="text-muted">
+                                <i class="fas fa-image me-2"></i>No image available
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="mb-3 row">
                     <div class="col-md-6 offset-md-4">
                         <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary text-white fw-bold">Edit</a>
                     </div>
@@ -47,4 +71,21 @@
         </div>
     </div>
 </div>
+
+<style>
+.product-image-container {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.product-image-container img {
+    transition: transform 0.3s ease;
+}
+
+.product-image-container img:hover {
+    transform: scale(1.05);
+}
+</style>
 @endsection

@@ -10,10 +10,10 @@
         <div class="card shadow">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <span>Create Product</span>
-                <a href="{{ route('products.index') }}" class="btn btn-light btn-sm text-primary fw-bold">&larr; Back</a>
+                <a href="{{ route('products.create') }}" class="btn btn-light btn-sm text-primary fw-bold">+ Add Product</a>
             </div>
             <div class="card-body bg-white">
-                <form action="{{ route('products.store') }}" method="post">
+                <form action="{{ route('products.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3 row">
                         <label for="code" class="col-md-4 col-form-label text-md-end text-start">Code</label>
@@ -60,6 +60,20 @@
                             @enderror
                         </div>
                     </div>
+
+                    <div class="mb-3 row">
+                        <label for="file" class="col-md-4 col-form-label text-md-end text-start">Product Image</label>
+                        <div class="col-md-6">
+                            <input type="file" class="form-control @error('file') is-invalid @enderror" id="file" name="file" accept="image/*" onchange="previewImage(this)">
+                            <div id="imagePreview" class="mt-2" style="display: none;">
+                                <img id="preview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px;">
+                            </div>
+                            @error('file')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
                     <div class="mb-3 row">
                         <input type="submit" class="col-md-3 offset-md-5 btn btn-primary text-white fw-bold" value="Create">
                     </div>
@@ -68,4 +82,25 @@
         </div>
     </div>
 </div>
+
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('preview');
+    const previewDiv = document.getElementById('imagePreview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewDiv.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.src = '#';
+        previewDiv.style.display = 'none';
+    }
+}
+</script>
 @endsection

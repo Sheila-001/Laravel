@@ -10,13 +10,20 @@
         <div class="card shadow">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <span>Product List</span>
-                <a href="{{ route('products.create') }}" class="btn btn-light btn-sm text-primary fw-bold">+ Add Product</a>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('products.create') }}" class="btn btn-light btn-sm text-primary fw-bold">+ Add Product</a>
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-light btn-sm text-primary fw-bold">Logout</button>
+                    </form>
+                </div>
             </div>
             <div class="card-body bg-white">
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle">
                         <thead class="bg-primary text-white text-center">
                             <tr>
+                                <th>Image</th>
                                 <th>#</th>
                                 <th>Code</th>
                                 <th>Name</th>
@@ -29,6 +36,13 @@
                         <tbody>
                         @forelse($products as $product)
                             <tr>
+                                <td>
+                                    @if($product->file)
+                                        <img src="{{ asset('storage/uploads/' . $product->file) }}" alt="{{ $product->name }}" style="max-width: 80px; max-height: 80px;">
+                                    @else
+                                        <span>No image</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>{{ $product->code }}</td>
                                 <td>{{ $product->name }}</td>
